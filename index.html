@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Epidemiology & Biostatistics - Interactive Quiz Presentation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0f172a;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    /* 16:9 Aspect Ratio PowerPoint Slide Container */
+    .slide-viewport {
+      width: 100vw;
+      max-width: 1200px;
+      aspect-ratio: 16 / 9;
+      background: #ffffff;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @media (max-aspect-ratio: 16/9), (max-width: 1024px) {
+      .slide-viewport {
+        aspect-ratio: auto;
+        min-height: 95vh;
+        margin: 12px;
+        border-radius: 8px;
+      }
+    }
+
+    /* Presentation Slide Transitions */
+    .slide-content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2.25rem 3rem;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 640px) {
+      .slide-content-area {
+        padding: 1.25rem;
+      }
+    }
+
+    .option-card {
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1.5px solid #e2e8f0;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    .option-card:hover:not(.disabled) {
+      border-color: #94a3b8;
+      background-color: #f8fafc;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+    }
+
+    .option-card:active:not(.disabled) {
+      transform: translateY(0);
+    }
+
+    /* Correct Feedback Style */
+    .option-card.correct {
+      border-color: #10b981 !important;
+      background-color: #ecfdf5 !important;
+      color: #065f46 !important;
+      box-shadow: 0 0 0 1px #10b981, 0 4px 12px rgba(16, 185, 129, 0.15) !important;
+    }
+
+    .option-card.correct .option-badge {
+      background-color: #10b981 !important;
+      color: #ffffff !important;
+    }
+
+    /* Incorrect Feedback Style */
+    .option-card.incorrect {
+      border-color: #ef4444 !important;
+      background-color: #fef2f2 !important;
+      color: #991b1b !important;
+      box-shadow: 0 0 0 1px #ef4444, 0 4px 12px rgba(239, 68, 68, 0.15) !important;
+    }
+
+    .option-card.incorrect .option-badge {
+      background-color: #ef4444 !important;
+      color: #ffffff !important;
+    }
+
+    .option-card.dimmed {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* Monospace question badges */
+    .mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Smooth Progress Bar */
+    .progress-bar-fill {
+      transition: width 0.3s ease-out;
+    }
+
+    /* Custom Scrollbar for slide text when needed */
+    .slide-content-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    .slide-content-area::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="slide-viewport" id="presentationContainer">
+
+    <!-- Slide Top Academic Header -->
+    <header class="h-14 border-b border-slate-200 px-6 sm:px-10 flex items-center justify-between bg-white text-slate-600 shrink-0">
+      <div class="flex items-center space-x-3">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-900"></span>
+        <h1 class="text-xs sm:text-sm font-semibold tracking-wider uppercase text-slate-800">
+          Epidemiology &amp; Biostatistics
+        </h1>
+        <span class="hidden sm:inline text-slate-300">|</span>
+        <span class="hidden sm:inline text-xs text-slate-500 font-medium">Academic Assessment Series</span>
+      </div>
+
+      <div class="flex items-center space-x-3 sm:space-x-4">
+        <div id="slideCounterTag" class="hidden text-xs font-semibold mono-num bg-slate-100 text-slate-700 px-2.5 py-1 rounded">
+          Slide 1 of 70
+        </div>
+        <button id="fullscreenToggleBtn" title="Toggle Fullscreen (F)" class="text-slate-500 hover:text-slate-800 p-1.5 rounded-md hover:bg-slate-100 transition">
+          <svg id="fullscreenIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Slide Progress Bar Track -->
+    <div id="progressBarContainer" class="w-full bg-slate-100 h-1 hidden">
+      <div id="progressBar" class="bg-slate-800 h-1 w-0 progress-bar-fill"></div>
+    </div>
+
+    <div class="slide-content-area" id="slideArea">
+
+      <!-- SCREEN 1: WELCOME SCREEN -->
+      <section id="welcomeScreen" class="h-full flex flex-col justify-between my-auto py-4">
+        <div class="space-y-4 max-w-3xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-800 text-xs font-semibold uppercase tracking-widest">
+            <span>University Standard Curriculum</span>
+          </div>
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            EPIDEMIOLOGY &amp; BIOSTATISTICS
+          </h2>
+          <p class="text-lg sm:text-xl text-slate-600 font-normal">
+            Interactive Multiple-Choice Quiz Presentation
+          </p>
+          <p class="text-sm text-slate-500 max-w-2xl leading-relaxed pt-2">
+            Comprehensive 70-question board-style review covering study designs, risk ratios, odds ratios, diagnostic test sensitivity/specificity, survival analysis, outbreak investigation, statistical inference, and regression models.
+          </p>
+        </div>
+
+        <div class="pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-6 text-sm text-slate-600">
+            <div>
+              <span class="block text-2xl font-bold text-slate-900 mono-num">70</span>
+              <span class="text-xs text-slate-500 uppercase tracking-wide">Standard MCQs</span>
+            </div>
+            <div class="h-8 w-px bg-slate-200"></div>
+            <div>
+              <span class="block text-2xl font-bold text-slate-900 mono-num">4</span>
+              <span class="text-xs text-slate-500 uppercase tracking-wide">Options Per Question</span>
+            </div>
+            <div class="h-8 w-px bg-slate-200"></div>
+            <div>
+              <span class="block text-2xl font-bold text-slate-900">Immediate</span>
+              <span class="text-xs text-slate-500 uppercase tracking-wide">Feedback &amp; Retry</span>
+            </div>
+          </div>
+
+          <button id="startQuizBtn" class="w-full sm:w-auto px-8 py-3.5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-medium text-sm rounded-lg shadow-md transition flex items-center justify-center gap-2">
+            <span>Start Quiz Presentation</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- SCREEN 2: ACTIVE QUESTION SCREEN -->
+      <section id="questionScreen" class="hidden h-full flex flex-col justify-between">
+        <!-- Question Meta & Prompt -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between text-xs font-semibold tracking-wider uppercase text-slate-500">
+            <span id="questionCategoryTag" class="mono-num text-slate-800">QUESTION 1 OF 70</span>
+            <span id="firstAttemptStatus" class="text-slate-400 font-normal">Select the best answer</span>
+          </div>
+
+          <h2 id="questionText" class="text-lg sm:text-2xl font-bold text-slate-900 leading-snug tracking-tight">
+            <!-- Dynamic Question Text -->
+          </h2>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="optionsGrid" class="grid grid-cols-1 gap-2.5 sm:gap-3 my-4 sm:my-6">
+          <!-- Dynamic Option Buttons injected by script -->
+        </div>
+
+        <!-- Feedback & Action Banner -->
+        <div id="feedbackBanner" class="min-h-[58px] flex items-center justify-between pt-2 border-t border-slate-100">
+          <div id="feedbackMessageContainer" class="flex items-center gap-3">
+            <div id="feedbackBadge" class="hidden px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider"></div>
+            <p id="feedbackText" class="text-sm font-medium text-slate-600"></p>
+          </div>
+
+          <div id="feedbackActionArea" class="flex items-center gap-2">
+            <button id="tryAgainBtn" class="hidden px-4 py-2 text-xs sm:text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition active:scale-95">
+              Try Again
+            </button>
+            <button id="actionNextBtn" class="hidden px-5 py-2 text-xs sm:text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition active:scale-95 flex items-center gap-1.5">
+              <span>Next Question</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: COMPLETION / RESULTS SCREEN -->
+      <section id="resultsScreen" class="hidden h-full flex flex-col justify-between my-auto py-2">
+        <div class="space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold uppercase tracking-widest">
+            Assessment Completed
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            Performance Summary
+          </h2>
+          <p class="text-sm sm:text-base text-slate-600">
+            You have answered all 70 questions from the Epidemiology &amp; Biostatistics examination set.
+          </p>
+        </div>
+
+        <!-- Scoreboard Metrics Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+          <div class="p-4 sm:p-5 rounded-xl border border-slate-200 bg-slate-50/50">
+            <div class="text-xs uppercase font-semibold text-slate-500 tracking-wider">Final Score</div>
+            <div class="text-3xl sm:text-4xl font-black text-slate-900 mono-num mt-2">
+              <span id="finalScoreCount">0</span><span class="text-xl text-slate-400 font-normal"> / 70</span>
+            </div>
+            <div class="text-xs text-slate-500 mt-1">First-attempt correct answers</div>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-xl border border-slate-200 bg-slate-50/50">
+            <div class="text-xs uppercase font-semibold text-slate-500 tracking-wider">Percentage</div>
+            <div class="text-3xl sm:text-4xl font-black text-slate-900 mono-num mt-2" id="finalPercentage">
+              0%
+            </div>
+            <div class="text-xs text-slate-500 mt-1">Accuracy rating</div>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-xl border border-slate-200 bg-slate-50/50">
+            <div class="text-xs uppercase font-semibold text-slate-500 tracking-wider">Evaluation</div>
+            <div class="text-lg sm:text-xl font-bold text-slate-900 mt-2" id="performanceTier">
+              Competent
+            </div>
+            <div class="text-xs text-slate-500 mt-1" id="performanceDescription">Standard review completed</div>
+          </div>
+        </div>
+
+        <!-- Completion Actions -->
+        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p class="text-xs text-slate-500">
+            Epidemiology &amp; Biostatistics • University Interactive Slide Master
+          </p>
+          <button id="restartQuizBtn" class="w-full sm:w-auto px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm rounded-lg transition active:scale-95 flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            <span>Restart Presentation</span>
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <footer id="presentationFooter" class="h-14 border-t border-slate-200 px-6 sm:px-10 flex items-center justify-between bg-slate-50 text-slate-600 text-xs shrink-0 select-none">
+      <div class="flex items-center space-x-2">
+        <button id="prevSlideBtn" class="p-1.5 px-3 rounded border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-medium transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+          </svg>
+          <span class="hidden sm:inline">Previous</span>
+        </button>
+
+        <button id="nextSlideBtn" class="p-1.5 px-3 rounded border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-medium transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1">
+          <span class="hidden sm:inline">Next</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="hidden md:inline text-slate-400">Keyboard: &larr; / &rarr; navigate, A-D select</span>
+        <div id="footerSlideIndicator" class="mono-num font-semibold text-slate-700">Slide 1 / 70</div>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    /* Complete 70 Question Items Extracted Directly from the Document */
+    const QUIZ_QUESTIONS = [
+      {
+        id: 1,
+        question: "Which statement best defines epidemiology?",
+        options: {
+          A: "The study of individual patient treatment only",
+          B: "The study of the distribution and determinants of health-related states or events in populations, and the application of this knowledge to control health problems",
+          C: "The study of microorganisms in laboratory cultures only",
+          D: "The study of hospital administration"
+        },
+        answer: "B"
+      },
+      {
+        id: 2,
+        question: "Incidence primarily measures:",
+        options: {
+          A: "Existing cases in a population",
+          B: "New cases occurring in a population over a specified period",
+          C: "Deaths among diagnosed cases only",
+          D: "The proportion of a population that is vaccinated"
+        },
+        answer: "B"
+      },
+      {
+        id: 3,
+        question: "A population has 50 existing cases of hypertension among 1,000 residents on 1 January. What is the point prevalence?",
+        options: {
+          A: "0.5%",
+          B: "5%",
+          C: "20%",
+          D: "50%"
+        },
+        answer: "B"
+      },
+      {
+        id: 4,
+        question: "In a cohort study, 40 of 200 exposed persons develop disease and 20 of 300 unexposed persons develop disease. What is the risk ratio?",
+        options: {
+          A: "1.5",
+          B: "2.0",
+          C: "3.0",
+          D: "4.0"
+        },
+        answer: "C"
+      },
+      {
+        id: 5,
+        question: "Which measure is most directly associated with case-control studies?",
+        options: {
+          A: "Risk ratio",
+          B: "Odds ratio",
+          C: "Incidence rate ratio only",
+          D: "Attack rate"
+        },
+        answer: "B"
+      },
+      {
+        id: 6,
+        question: "A risk ratio of 1.0 indicates:",
+        options: {
+          A: "No observed association between exposure and outcome",
+          B: "A protective effect of exactly 100%",
+          C: "Complete causation",
+          D: "A statistically significant association"
+        },
+        answer: "A"
+      },
+      {
+        id: 7,
+        question: "If an exposure increases disease occurrence from 10% to 25%, the attributable risk among the exposed is:",
+        options: {
+          A: "10 percentage points",
+          B: "15 percentage points",
+          C: "25 percentage points",
+          D: "35 percentage points"
+        },
+        answer: "B"
+      },
+      {
+        id: 8,
+        question: "Which measure is particularly useful in outbreak investigations?",
+        options: {
+          A: "Attack rate",
+          B: "Median survival time only",
+          C: "Standard deviation only",
+          D: "Regression coefficient only"
+        },
+        answer: "A"
+      },
+      {
+        id: 9,
+        question: "During a foodborne outbreak, 80 cases occur among 400 people who ate the suspected food. The attack rate is:",
+        options: {
+          A: "5%",
+          B: "10%",
+          C: "20%",
+          D: "40%"
+        },
+        answer: "C"
+      },
+      {
+        id: 10,
+        question: "A mortality rate differs from a case-fatality proportion because mortality:",
+        options: {
+          A: "Measures deaths in the population, whereas case fatality measures deaths among people with the disease",
+          B: "Always measures only infectious diseases",
+          C: "Is always expressed as a ratio of exposed to unexposed persons",
+          D: "Cannot be calculated from population data"
+        },
+        answer: "A"
+      },
+      {
+        id: 11,
+        question: "Which study design follows exposed and unexposed groups forward in time to compare disease occurrence?",
+        options: {
+          A: "Case-control study",
+          B: "Cohort study",
+          C: "Ecological study",
+          D: "Cross-sectional study"
+        },
+        answer: "B"
+      },
+      {
+        id: 12,
+        question: "A cross-sectional study is particularly useful for estimating:",
+        options: {
+          A: "Prevalence",
+          B: "Incubation period with certainty",
+          C: "Cause-specific mortality only",
+          D: "Long-term survival after treatment"
+        },
+        answer: "A"
+      },
+      {
+        id: 13,
+        question: "Which study design is generally most efficient for studying a rare disease?",
+        options: {
+          A: "Case-control study",
+          B: "Prospective cohort study",
+          C: "Randomized trial of the entire population",
+          D: "Census"
+        },
+        answer: "A"
+      },
+      {
+        id: 14,
+        question: "In a randomized controlled trial, randomization primarily helps to:",
+        options: {
+          A: "Guarantee a large sample size",
+          B: "Balance known and unknown confounding factors between groups on average",
+          C: "Eliminate measurement error completely",
+          D: "Guarantee statistical significance"
+        },
+        answer: "B"
+      },
+      {
+        id: 15,
+        question: "In an ecological study, the unit of analysis is typically:",
+        options: {
+          A: "An individual patient only",
+          B: "A group or population",
+          C: "A laboratory specimen",
+          D: "A single clinical measurement"
+        },
+        answer: "B"
+      },
+      {
+        id: 16,
+        question: "Which is an example of selection bias?",
+        options: {
+          A: "A laboratory instrument gives readings consistently 2 units too high",
+          B: "Study participation differs systematically between people who are eligible and those who participate",
+          C: "Random variation occurs because of sampling",
+          D: "A p-value is calculated incorrectly"
+        },
+        answer: "B"
+      },
+      {
+        id: 17,
+        question: "Recall bias is especially relevant when:",
+        options: {
+          A: "Participants report past exposures differently depending on their disease status",
+          B: "A random-number generator is used",
+          C: "A laboratory machine is calibrated",
+          D: "A sample is selected randomly"
+        },
+        answer: "A"
+      },
+      {
+        id: 18,
+        question: "Confounding occurs when:",
+        options: {
+          A: "A third variable distorts the association between exposure and outcome",
+          B: "The sample size is exactly equal to the population size",
+          C: "The outcome is measured perfectly",
+          D: "Every participant has the same exposure"
+        },
+        answer: "A"
+      },
+      {
+        id: 19,
+        question: "Which method can be used to control confounding during the analysis stage?",
+        options: {
+          A: "Stratification",
+          B: "Randomization",
+          C: "Blinding",
+          D: "Increasing the number of study sites only"
+        },
+        answer: "A"
+      },
+      {
+        id: 20,
+        question: "Effect modification means that:",
+        options: {
+          A: "The effect of an exposure differs across levels of another variable",
+          B: "A study has no outcome",
+          C: "Sampling error has disappeared",
+          D: "A p-value has been set to zero"
+        },
+        answer: "A"
+      },
+      {
+        id: 21,
+        question: "Sensitivity of a diagnostic test is the:",
+        options: {
+          A: "Proportion of non-diseased people who test negative",
+          B: "Proportion of diseased people who test positive",
+          C: "Proportion of positive tests that are true positives",
+          D: "Proportion of negative tests that are true negatives"
+        },
+        answer: "B"
+      },
+      {
+        id: 22,
+        question: "Specificity is the:",
+        options: {
+          A: "Proportion of diseased people who test positive",
+          B: "Proportion of non-diseased people who test negative",
+          C: "Proportion of all people who test positive",
+          D: "Proportion of cases detected by surveillance"
+        },
+        answer: "B"
+      },
+      {
+        id: 23,
+        question: "Positive predictive value is the:",
+        options: {
+          A: "Probability that a person has disease given a positive test",
+          B: "Probability that a person is disease-free given a negative test",
+          C: "Probability that a diseased person tests negative",
+          D: "Probability that a non-diseased person tests positive"
+        },
+        answer: "A"
+      },
+      {
+        id: 24,
+        question: "As disease prevalence increases, the positive predictive value of a diagnostic test generally:",
+        options: {
+          A: "Decreases",
+          B: "Increases",
+          C: "Becomes exactly zero",
+          D: "Remains mathematically fixed regardless of prevalence"
+        },
+        answer: "B"
+      },
+      {
+        id: 25,
+        question: "A screening test with very high sensitivity is particularly useful when the aim is to:",
+        options: {
+          A: "Minimize false negatives",
+          B: "Minimize false positives only",
+          C: "Confirm every positive diagnosis",
+          D: "Estimate mean blood pressure"
+        },
+        answer: "A"
+      },
+      {
+        id: 26,
+        question: "The basic reproductive number R₀ refers to:",
+        options: {
+          A: "The number of deaths caused by a disease",
+          B: "The expected number of secondary infections generated by one infectious individual in a fully susceptible population under specified conditions",
+          C: "The percentage of a population that is immune",
+          D: "The average duration of hospitalization"
+        },
+        answer: "B"
+      },
+      {
+        id: 27,
+        question: "Herd immunity protects susceptible individuals primarily by:",
+        options: {
+          A: "Increasing the pathogen's virulence",
+          B: "Reducing opportunities for transmission through a sufficiently immune population",
+          C: "Increasing the number of susceptible people",
+          D: "Eliminating all diagnostic errors"
+        },
+        answer: "B"
+      },
+      {
+        id: 28,
+        question: "In outbreak investigation, the first practical step is generally to:",
+        options: {
+          A: "Publish the final report",
+          B: "Verify the diagnosis and confirm that an outbreak exists",
+          C: "Calculate a regression coefficient",
+          D: "Close all health facilities"
+        },
+        answer: "B"
+      },
+      {
+        id: 29,
+        question: "A line list in outbreak investigation is mainly used to:",
+        options: {
+          A: "Record key information about individual cases systematically",
+          B: "Replace laboratory confirmation",
+          C: "Calculate only national GDP",
+          D: "Determine the price of medicines"
+        },
+        answer: "A"
+      },
+      {
+        id: 30,
+        question: "A spot map in field epidemiology is useful for:",
+        options: {
+          A: "Displaying the geographic distribution of cases",
+          B: "Calculating a confidence interval automatically",
+          C: "Estimating a regression coefficient",
+          D: "Measuring laboratory sensitivity"
+        },
+        answer: "A"
+      },
+      {
+        id: 31,
+        question: "Surveillance is best described as:",
+        options: {
+          A: "Continuous, systematic collection, analysis, interpretation, and dissemination of health data for public health action",
+          B: "A one-time laboratory experiment",
+          C: "Treatment of individual patients only",
+          D: "Random selection of research participants"
+        },
+        answer: "A"
+      },
+      {
+        id: 32,
+        question: "A surveillance system's sensitivity refers to its ability to:",
+        options: {
+          A: "Detect cases that truly occur",
+          B: "Avoid all false-positive reports",
+          C: "Predict treatment response",
+          D: "Estimate the mean of a continuous variable"
+        },
+        answer: "A"
+      },
+      {
+        id: 33,
+        question: "Which is an example of passive surveillance?",
+        options: {
+          A: "Health facilities routinely submit reports through an established reporting system",
+          B: "Epidemiologists actively search hospitals for unreported cases",
+          C: "Researchers conduct door-to-door case finding specifically for an outbreak",
+          D: "Investigators visit every household daily"
+        },
+        answer: "A"
+      },
+      {
+        id: 34,
+        question: "Active surveillance generally involves:",
+        options: {
+          A: "Waiting for routine reports without follow-up",
+          B: "Proactively seeking cases or information from reporting sources",
+          C: "Ignoring incomplete reports",
+          D: "Reporting only laboratory results that are positive"
+        },
+        answer: "B"
+      },
+      {
+        id: 35,
+        question: "The mean of 2, 4, 6, 8, and 10 is:",
+        options: {
+          A: "5",
+          B: "6",
+          C: "7",
+          D: "8"
+        },
+        answer: "B"
+      },
+      {
+        id: 36,
+        question: "The median of 3, 4, 5, 100, and 101 is:",
+        options: {
+          A: "4",
+          B: "5",
+          C: "42.6",
+          D: "100"
+        },
+        answer: "B"
+      },
+      {
+        id: 37,
+        question: "Which measure of central tendency is generally most resistant to extreme values?",
+        options: {
+          A: "Mean",
+          B: "Median",
+          C: "Variance",
+          D: "Standard deviation"
+        },
+        answer: "B"
+      },
+      {
+        id: 38,
+        question: "Standard deviation measures:",
+        options: {
+          A: "The central value only",
+          B: "The dispersion of observations around their mean",
+          C: "The probability of disease causation",
+          D: "The number of study participants"
+        },
+        answer: "B"
+      },
+      {
+        id: 39,
+        question: "Variance is:",
+        options: {
+          A: "The square of the standard deviation",
+          B: "The square root of the mean",
+          C: "Always equal to the median",
+          D: "The reciprocal of the mean"
+        },
+        answer: "A"
+      },
+      {
+        id: 40,
+        question: "A positively skewed distribution typically has:",
+        options: {
+          A: "A longer tail toward higher values",
+          B: "A longer tail toward lower values",
+          C: "Perfect symmetry",
+          D: "No variability"
+        },
+        answer: "A"
+      },
+      {
+        id: 41,
+        question: "In a normal distribution, approximately what percentage of observations lie within one standard deviation of the mean?",
+        options: {
+          A: "50%",
+          B: "68%",
+          C: "95%",
+          D: "99.7%"
+        },
+        answer: "B"
+      },
+      {
+        id: 42,
+        question: "A z-score tells us:",
+        options: {
+          A: "The number of cases in a population",
+          B: "How many standard deviations an observation is from the mean",
+          C: "Whether a study is randomized",
+          D: "The sensitivity of a test"
+        },
+        answer: "B"
+      },
+      {
+        id: 43,
+        question: "The standard error of a sample mean generally becomes smaller when:",
+        options: {
+          A: "Sample size increases",
+          B: "Sample size decreases",
+          C: "Measurement variability increases without changing sample size",
+          D: "The population becomes smaller in every circumstance"
+        },
+        answer: "A"
+      },
+      {
+        id: 44,
+        question: "A 95% confidence interval for a population mean represents:",
+        options: {
+          A: "A range of plausible values for the population parameter under the method used",
+          B: "A 95% probability that the fixed parameter changes from sample to sample",
+          C: "The probability that 95% of individual observations lie in the interval",
+          D: "A guarantee that the sample mean is correct"
+        },
+        answer: "A"
+      },
+      {
+        id: 45,
+        question: "If a 95% confidence interval for a risk ratio is 1.20 to 2.40, the result is generally considered:",
+        options: {
+          A: "Compatible with no association at the 5% level",
+          B: "Statistically significant against the null value of 1 at approximately the 5% level",
+          C: "Proof that the exposure causes disease",
+          D: "Evidence that the risk ratio is exactly 1.80"
+        },
+        answer: "B"
+      },
+      {
+        id: 46,
+        question: "A p-value is best interpreted as:",
+        options: {
+          A: "The probability that the null hypothesis is true",
+          B: "The probability, under the null hypothesis, of observing data at least as extreme as those observed, according to the test",
+          C: "The probability that the alternative hypothesis is false",
+          D: "The probability that the study has no bias"
+        },
+        answer: "B"
+      },
+      {
+        id: 47,
+        question: "If p = 0.03 and α = 0.05, the conventional decision is to:",
+        options: {
+          A: "Reject the null hypothesis",
+          B: "Accept the null hypothesis as proven true",
+          C: "Increase α to 0.50",
+          D: "Conclude that the effect is clinically important"
+        },
+        answer: "A"
+      },
+      {
+        id: 48,
+        question: "A Type I error occurs when a researcher:",
+        options: {
+          A: "Fails to reject a false null hypothesis",
+          B: "Rejects a true null hypothesis",
+          C: "Uses a large sample",
+          D: "Measures a variable continuously"
+        },
+        answer: "B"
+      },
+      {
+        id: 49,
+        question: "A Type II error occurs when a researcher:",
+        options: {
+          A: "Rejects a true null hypothesis",
+          B: "Fails to reject a false null hypothesis",
+          C: "Calculates the mean correctly",
+          D: "Finds a statistically significant result"
+        },
+        answer: "B"
+      },
+      {
+        id: 50,
+        question: "Statistical power is the probability of:",
+        options: {
+          A: "Detecting an effect when a specified effect truly exists",
+          B: "Making a Type I error",
+          C: "Obtaining a p-value of exactly 0.05",
+          D: "Eliminating all confounding"
+        },
+        answer: "A"
+      },
+      {
+        id: 51,
+        question: "Which test is most appropriate for comparing the means of two independent approximately normal groups?",
+        options: {
+          A: "Independent-samples t-test",
+          B: "Chi-square test",
+          C: "McNemar test",
+          D: "One-sample proportion test only"
+        },
+        answer: "A"
+      },
+      {
+        id: 52,
+        question: "Which test is commonly used to assess association between two categorical variables?",
+        options: {
+          A: "Pearson chi-square test",
+          B: "Paired t-test",
+          C: "Pearson correlation only",
+          D: "Kaplan–Meier test"
+        },
+        answer: "A"
+      },
+      {
+        id: 53,
+        question: "For paired continuous measurements that are approximately normally distributed, the appropriate test for comparing means is:",
+        options: {
+          A: "Independent-samples t-test",
+          B: "Paired t-test",
+          C: "Chi-square test",
+          D: "Fisher's exact test"
+        },
+        answer: "B"
+      },
+      {
+        id: 54,
+        question: "Fisher's exact test is particularly useful for categorical data when:",
+        options: {
+          A: "Expected cell counts are small",
+          B: "The outcome is normally distributed",
+          C: "There are no categorical variables",
+          D: "The sample contains only continuous measurements"
+        },
+        answer: "A"
+      },
+      {
+        id: 55,
+        question: "Pearson correlation primarily measures:",
+        options: {
+          A: "The strength and direction of linear association between two quantitative variables",
+          B: "Causal effect of an exposure",
+          C: "Difference between two disease prevalences",
+          D: "Sensitivity of a diagnostic test"
+        },
+        answer: "A"
+      },
+      {
+        id: 56,
+        question: "A correlation coefficient of r = -0.90 indicates:",
+        options: {
+          A: "A strong negative linear association",
+          B: "A weak positive association",
+          C: "No relationship of any kind",
+          D: "That one variable definitely causes the other"
+        },
+        answer: "A"
+      },
+      {
+        id: 57,
+        question: "In simple linear regression, the slope coefficient represents:",
+        options: {
+          A: "The expected change in the outcome for a one-unit increase in the predictor",
+          B: "The proportion of missing data",
+          C: "The sensitivity of the outcome measurement",
+          D: "The sample size"
+        },
+        answer: "A"
+      },
+      {
+        id: 58,
+        question: "In logistic regression, an odds ratio of 2.5 for an exposure means:",
+        options: {
+          A: "The adjusted odds of the outcome are 2.5 times those in the reference group, holding other model variables constant",
+          B: "The risk is exactly 2.5 times higher in every population",
+          C: "There are exactly 2.5 extra cases per 100 people",
+          D: "The p-value is 2.5"
+        },
+        answer: "A"
+      },
+      {
+        id: 59,
+        question: "In a Poisson regression model for count data, the response variable is typically:",
+        options: {
+          A: "A count of events",
+          B: "A binary disease status only",
+          C: "A continuous blood pressure measurement",
+          D: "A survival time with censoring"
+        },
+        answer: "A"
+      },
+      {
+        id: 60,
+        question: "Overdispersion in Poisson regression occurs when:",
+        options: {
+          A: "The observed variance is substantially greater than the mean",
+          B: "The observed mean is always zero",
+          C: "The variance is exactly equal to the mean",
+          D: "Every observation has the same value"
+        },
+        answer: "A"
+      },
+      {
+        id: 61,
+        question: "A negative binomial model is often useful for count data when:",
+        options: {
+          A: "There is overdispersion relative to the Poisson model",
+          B: "The outcome is strictly continuous",
+          C: "There are no counts",
+          D: "The response must be normally distributed"
+        },
+        answer: "A"
+      },
+      {
+        id: 62,
+        question: "Zero-inflated count models are designed for situations where:",
+        options: {
+          A: "There are more zeros than a standard count distribution would reasonably accommodate",
+          B: "All observations are positive",
+          C: "The outcome has no zeros",
+          D: "The predictor variables are all binary"
+        },
+        answer: "A"
+      },
+      {
+        id: 63,
+        question: "A zero-truncated count model is appropriate when:",
+        options: {
+          A: "Zero counts cannot occur or are excluded by the sampling mechanism",
+          B: "There are excessive zero counts",
+          C: "The outcome is normally distributed",
+          D: "Every observation is censored"
+        },
+        answer: "A"
+      },
+      {
+        id: 64,
+        question: "In survival analysis, censoring occurs when:",
+        options: {
+          A: "The exact event time is not observed for some subjects within the study period",
+          B: "Every participant experiences the event at the same time",
+          C: "The outcome is measured without error",
+          D: "The sample size is doubled"
+        },
+        answer: "A"
+      },
+      {
+        id: 65,
+        question: "The Kaplan–Meier method is primarily used to:",
+        options: {
+          A: "Estimate the survival function over time while accounting for censoring",
+          B: "Compare two population means",
+          C: "Estimate a prevalence ratio only",
+          D: "Calculate a chi-square statistic"
+        },
+        answer: "A"
+      },
+      {
+        id: 66,
+        question: "The hazard ratio in a proportional hazards model compares:",
+        options: {
+          A: "Instantaneous event rates between groups, under the model assumptions",
+          B: "Mean values of a continuous variable only",
+          C: "Disease prevalences at one time point only",
+          D: "Percentages of missing observations"
+        },
+        answer: "A"
+      },
+      {
+        id: 67,
+        question: "In meta-analysis, a forest plot commonly displays:",
+        options: {
+          A: "Effect estimates and their confidence intervals from individual studies and the pooled estimate",
+          B: "Only raw patient-level data",
+          C: "A map of disease cases",
+          D: "Laboratory culture results"
+        },
+        answer: "A"
+      },
+      {
+        id: 68,
+        question: "Heterogeneity in a meta-analysis refers to:",
+        options: {
+          A: "Variation in study results or underlying effects beyond what would be expected from sampling error alone",
+          B: "The number of participants lost to follow-up in one study only",
+          C: "The use of identical methods in every study",
+          D: "The absence of any difference between studies"
+        },
+        answer: "A"
+      },
+      {
+        id: 69,
+        question: "Which measure is most appropriate for assessing agreement between two observers classifying subjects into categorical disease-status categories, beyond chance agreement?",
+        options: {
+          A: "Cohen's kappa",
+          B: "Pearson's r",
+          C: "Relative risk",
+          D: "Standard deviation"
+        },
+        answer: "A"
+      },
+      {
+        id: 70,
+        question: "An epidemiologist finds an adjusted odds ratio of 1.80 with a 95% confidence interval of 1.20–2.70. Which is the best interpretation?",
+        options: {
+          A: "The exposure is associated with higher odds of the outcome, and the interval excludes the null value of 1",
+          B: "The exposure causes exactly 80% more disease in every population",
+          C: "There is no evidence of association because the interval is wider than 1 unit",
+          D: "The odds ratio means that 80% of exposed persons developed the outcome"
+        },
+        answer: "A"
+      }
+    ];
+
+    const state = {
+      currentIndex: 0,
+      totalQuestions: QUIZ_QUESTIONS.length,
+      currentScreen: 'welcome', // 'welcome' | 'quiz' | 'results'
+      userAnswers: {},         // questionIndex => { selected: 'B', isCorrect: true, firstAttemptCorrect: boolean, attempts: number }
+      isAnswered: false,
+      score: 0
+    };
+
+    // DOM Reference Cache
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const questionScreen = document.getElementById('questionScreen');
+    const resultsScreen = document.getElementById('resultsScreen');
+    const slideCounterTag = document.getElementById('slideCounterTag');
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    const progressBar = document.getElementById('progressBar');
+    const questionCategoryTag = document.getElementById('questionCategoryTag');
+    const questionText = document.getElementById('questionText');
+    const optionsGrid = document.getElementById('optionsGrid');
+    const feedbackBadge = document.getElementById('feedbackBadge');
+    const feedbackText = document.getElementById('feedbackText');
+    const tryAgainBtn = document.getElementById('tryAgainBtn');
+    const actionNextBtn = document.getElementById('actionNextBtn');
+    const firstAttemptStatus = document.getElementById('firstAttemptStatus');
+    const prevSlideBtn = document.getElementById('prevSlideBtn');
+    const nextSlideBtn = document.getElementById('nextSlideBtn');
+    const footerSlideIndicator = document.getElementById('footerSlideIndicator');
+    const startQuizBtn = document.getElementById('startQuizBtn');
+    const restartQuizBtn = document.getElementById('restartQuizBtn');
+    const fullscreenToggleBtn = document.getElementById('fullscreenToggleBtn');
+    const presentationContainer = document.getElementById('presentationContainer');
+
+    function showScreen(screen) {
+      state.currentScreen = screen;
+      welcomeScreen.classList.add('hidden');
+      questionScreen.classList.add('hidden');
+      resultsScreen.classList.add('hidden');
+
+      if (screen === 'welcome') {
+        welcomeScreen.classList.remove('hidden');
+        slideCounterTag.classList.add('hidden');
+        progressBarContainer.classList.add('hidden');
+        footerSlideIndicator.textContent = `Slide 0 / ${state.totalQuestions}`;
+        prevSlideBtn.disabled = true;
+        nextSlideBtn.disabled = false;
+      } else if (screen === 'quiz') {
+        questionScreen.classList.remove('hidden');
+        slideCounterTag.classList.remove('hidden');
+        progressBarContainer.classList.remove('hidden');
+        renderQuestion(state.currentIndex);
+      } else if (screen === 'results') {
+        resultsScreen.classList.remove('hidden');
+        slideCounterTag.classList.remove('hidden');
+        slideCounterTag.textContent = "Summary";
+        progressBarContainer.classList.remove('hidden');
+        progressBar.style.width = '100%';
+        renderResults();
+        footerSlideIndicator.textContent = `Slide 70 / ${state.totalQuestions}`;
+        prevSlideBtn.disabled = false;
+        nextSlideBtn.disabled = true;
+      }
+    }
+
+    function renderQuestion(index) {
+      const q = QUIZ_QUESTIONS[index];
+      const qNum = index + 1;
+
+      // Update Header & Counter
+      questionCategoryTag.textContent = `QUESTION ${qNum} OF ${state.totalQuestions}`;
+      slideCounterTag.textContent = `Slide ${qNum} of ${state.totalQuestions}`;
+      footerSlideIndicator.textContent = `Slide ${qNum} / ${state.totalQuestions}`;
+
+      // Update Progress bar
+      const progressPercent = ((qNum) / state.totalQuestions) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+
+      // Set Question Text
+      questionText.textContent = `${q.id}. ${q.question}`;
+
+      // Reset feedback section
+      feedbackBadge.className = 'hidden px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider';
+      feedbackBadge.textContent = '';
+      feedbackText.textContent = '';
+      tryAgainBtn.classList.add('hidden');
+      actionNextBtn.classList.add('hidden');
+
+      const existingRecord = state.userAnswers[index];
+      const hasAnswered = existingRecord && existingRecord.selected !== null;
+
+      // Update Previous / Next control state
+      prevSlideBtn.disabled = (index === 0);
+      nextSlideBtn.disabled = !hasAnswered;
+
+      if (!existingRecord) {
+        firstAttemptStatus.textContent = "Click an option or press A, B, C, D";
+        firstAttemptStatus.className = "text-slate-400 font-normal";
+      } else if (existingRecord.attempts > 1) {
+        firstAttemptStatus.textContent = `Attempt ${existingRecord.attempts}`;
+        firstAttemptStatus.className = "text-amber-600 font-medium";
+      } else {
+        firstAttemptStatus.textContent = "Submitted";
+        firstAttemptStatus.className = "text-slate-500 font-normal";
+      }
+
+      // Generate Option Buttons
+      optionsGrid.innerHTML = '';
+      const optionKeys = ['A', 'B', 'C', 'D'];
+
+      optionKeys.forEach(letter => {
+        if (!q.options[letter]) return;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'option-card w-full text-left p-3 sm:p-4 rounded-xl flex items-center justify-between group';
+        btn.dataset.key = letter;
+
+        const contentWrapper = document.createElement('div');
+        contentWrapper.className = 'flex items-center gap-3.5 pr-3';
+
+        const badge = document.createElement('span');
+        badge.className = 'option-badge w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-800 font-bold text-xs sm:text-sm mono-num transition shrink-0 group-hover:bg-slate-200';
+        badge.textContent = letter;
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'text-xs sm:text-sm font-medium text-slate-800 leading-snug';
+        textSpan.textContent = q.options[letter];
+
+        contentWrapper.appendChild(badge);
+        contentWrapper.appendChild(textSpan);
+        btn.appendChild(contentWrapper);
+
+        // Retain visual state if question was already attempted
+        if (existingRecord) {
+          const isSelected = existingRecord.selected === letter;
+          const isCorrectAnswer = (letter === q.answer);
+
+          if (existingRecord.isCorrect) {
+            btn.classList.add('disabled');
+            if (isSelected) {
+              btn.classList.add('correct');
+            } else {
+              btn.classList.add('dimmed');
+            }
+          } else {
+            // Incorrect state
+            if (isSelected) {
+              btn.classList.add('incorrect');
+            } else if (isCorrectAnswer) {
+              btn.classList.add('correct');
+            } else {
+              btn.classList.add('dimmed');
+            }
+          }
+        }
+
+        btn.addEventListener('click', () => handleOptionSelection(letter));
+        optionsGrid.appendChild(btn);
+      });
+
+      // Restore feedback banner if already evaluated
+      if (existingRecord) {
+        if (existingRecord.isCorrect) {
+          feedbackBadge.textContent = "CORRECT!";
+          feedbackBadge.className = 'px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800';
+          feedbackText.textContent = `Option ${q.answer} is the correct answer.`;
+          actionNextBtn.classList.remove('hidden');
+          actionNextBtn.textContent = (index === state.totalQuestions - 1) ? "View Final Summary" : "Next Question";
+        } else {
+          feedbackBadge.textContent = "INCORRECT";
+          feedbackBadge.className = 'px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider bg-red-100 text-red-800';
+          feedbackText.textContent = `Correct option is ${q.answer}: "${q.options[q.answer]}"`;
+          tryAgainBtn.classList.remove('hidden');
+          actionNextBtn.classList.remove('hidden');
+          actionNextBtn.textContent = (index === state.totalQuestions - 1) ? "View Final Summary" : "Next Question";
+        }
+      }
+    }
+
+    function handleOptionSelection(selectedLetter) {
+      const q = QUIZ_QUESTIONS[state.currentIndex];
+      const isCorrect = (selectedLetter === q.answer);
+
+      // Fetch or initialize record
+      let record = state.userAnswers[state.currentIndex];
+      if (!record) {
+        // First ever attempt for this question
+        record = {
+          selected: selectedLetter,
+          isCorrect: isCorrect,
+          firstAttemptCorrect: isCorrect,
+          attempts: 1
+        };
+        state.userAnswers[state.currentIndex] = record;
+        if (isCorrect) {
+          state.score += 1;
+        }
+      } else {
+        // Subsequent attempts
+        record.selected = selectedLetter;
+        record.attempts += 1;
+        record.isCorrect = isCorrect;
+      }
+
+      // Refresh Option Cards styling
+      const allButtons = optionsGrid.querySelectorAll('.option-card');
+      allButtons.forEach(btn => {
+        const key = btn.dataset.key;
+        btn.classList.remove('correct', 'incorrect', 'dimmed', 'disabled');
+
+        if (key === selectedLetter) {
+          if (isCorrect) {
+            btn.classList.add('correct', 'disabled');
+          } else {
+            btn.classList.add('incorrect');
+          }
+        } else if (key === q.answer && !isCorrect) {
+          // Reveal correct option in green
+          btn.classList.add('correct');
+        } else {
+          btn.classList.add('dimmed');
+        }
+      });
+
+      // Update feedback banner
+      if (isCorrect) {
+        feedbackBadge.textContent = "CORRECT!";
+        feedbackBadge.className = 'px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800';
+        feedbackText.textContent = `Option ${q.answer} is correct.`;
+        tryAgainBtn.classList.add('hidden');
+      } else {
+        feedbackBadge.textContent = "INCORRECT";
+        feedbackBadge.className = 'px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider bg-red-100 text-red-800';
+        feedbackText.textContent = `Correct option is ${q.answer}: "${q.options[q.answer]}"`;
+        tryAgainBtn.classList.remove('hidden');
+      }
+
+      actionNextBtn.classList.remove('hidden');
+      actionNextBtn.textContent = (state.currentIndex === state.totalQuestions - 1) ? "View Final Summary" : "Next Question";
+      nextSlideBtn.disabled = false;
+    }
+
+    function handleTryAgain() {
+      const q = QUIZ_QUESTIONS[state.currentIndex];
+      // Reset current button visual styles to allow new try
+      const allButtons = optionsGrid.querySelectorAll('.option-card');
+      allButtons.forEach(btn => {
+        btn.classList.remove('correct', 'incorrect', 'dimmed', 'disabled');
+      });
+
+      feedbackBadge.className = 'hidden';
+      feedbackText.textContent = "Try again: pick another option.";
+      tryAgainBtn.classList.add('hidden');
+      actionNextBtn.classList.add('hidden');
+
+      firstAttemptStatus.textContent = "Retrying current question...";
+      firstAttemptStatus.className = "text-amber-600 font-medium";
+    }
+
+    function advanceNext() {
+      if (state.currentScreen === 'welcome') {
+        showScreen('quiz');
+        return;
+      }
+      if (state.currentScreen === 'quiz') {
+        const record = state.userAnswers[state.currentIndex];
+        if (!record || record.selected === null) {
+          // Prevent accidental skip before answering
+          feedbackText.textContent = "Please choose an answer before proceeding.";
+          feedbackText.className = "text-sm font-semibold text-rose-600";
+          return;
+        }
+
+        if (state.currentIndex < state.totalQuestions - 1) {
+          state.currentIndex += 1;
+          renderQuestion(state.currentIndex);
+        } else {
+          showScreen('results');
+        }
+      }
+    }
+
+    function advancePrev() {
+      if (state.currentScreen === 'quiz' && state.currentIndex > 0) {
+        state.currentIndex -= 1;
+        renderQuestion(state.currentIndex);
+      } else if (state.currentScreen === 'results') {
+        state.currentIndex = state.totalQuestions - 1;
+        showScreen('quiz');
+      }
+    }
+
+    function renderResults() {
+      // Calculate first-attempt correct count
+      let firstAttemptCorrectCount = 0;
+      for (let i = 0; i < state.totalQuestions; i++) {
+        if (state.userAnswers[i] && state.userAnswers[i].firstAttemptCorrect) {
+          firstAttemptCorrectCount++;
+        }
+      }
+
+      const percent = Math.round((firstAttemptCorrectCount / state.totalQuestions) * 100);
+
+      document.getElementById('finalScoreCount').textContent = firstAttemptCorrectCount;
+      document.getElementById('finalPercentage').textContent = `${percent}%`;
+
+      const tierEl = document.getElementById('performanceTier');
+      const descEl = document.getElementById('performanceDescription');
+
+      if (percent >= 85) {
+        tierEl.textContent = "Distinction";
+        tierEl.className = "text-lg sm:text-xl font-bold text-emerald-600 mt-2";
+        descEl.textContent = "Exceptional mastery of epidemiology and statistical principles.";
+      } else if (percent >= 70) {
+        tierEl.textContent = "Proficient";
+        tierEl.className = "text-lg sm:text-xl font-bold text-blue-600 mt-2";
+        descEl.textContent = "Solid understanding of study designs, measures of association, and inference.";
+      } else if (percent >= 50) {
+        tierEl.textContent = "Passing / Competent";
+        tierEl.className = "text-lg sm:text-xl font-bold text-amber-600 mt-2";
+        descEl.textContent = "Review suggested for regression modeling and diagnostic validity concepts.";
+      } else {
+        tierEl.textContent = "Needs Revision";
+        tierEl.className = "text-lg sm:text-xl font-bold text-rose-600 mt-2";
+        descEl.textContent = "Recommend focused review of fundamental biostatistics and surveillance topics.";
+      }
+    }
+
+    function restartQuiz() {
+      state.currentIndex = 0;
+      state.userAnswers = {};
+      state.score = 0;
+      showScreen('welcome');
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        if (presentationContainer.requestFullscreen) {
+          presentationContainer.requestFullscreen().catch(err => {
+            console.warn("Fullscreen request error:", err);
+          });
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    startQuizBtn.addEventListener('click', () => {
+      showScreen('quiz');
+    });
+
+    restartQuizBtn.addEventListener('click', restartQuiz);
+    tryAgainBtn.addEventListener('click', handleTryAgain);
+    actionNextBtn.addEventListener('click', advanceNext);
+    nextSlideBtn.addEventListener('click', advanceNext);
+    prevSlideBtn.addEventListener('click', advancePrev);
+    fullscreenToggleBtn.addEventListener('click', toggleFullScreen);
+
+    // Keyboard Navigation (Presentation style)
+    window.addEventListener('keydown', (e) => {
+      // Fullscreen shortcut 'F'
+      if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey) {
+        toggleFullScreen();
+        return;
+      }
+
+      if (state.currentScreen === 'welcome') {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          showScreen('quiz');
+        }
+        return;
+      }
+
+      if (state.currentScreen === 'quiz') {
+        // Answer hotkeys A, B, C, D
+        const key = e.key.toUpperCase();
+        if (['A', 'B', 'C', 'D'].includes(key)) {
+          const targetBtn = optionsGrid.querySelector(`[data-key="${key}"]`);
+          if (targetBtn && !targetBtn.classList.contains('disabled')) {
+            handleOptionSelection(key);
+          }
+          return;
+        }
+
+        // Navigation Hotkeys
+        if (e.key === 'ArrowRight' || e.key === 'Enter') {
+          const record = state.userAnswers[state.currentIndex];
+          if (record && record.selected !== null) {
+            advanceNext();
+          }
+        } else if (e.key === 'ArrowLeft') {
+          advancePrev();
+        }
+      }
+
+      if (state.currentScreen === 'results') {
+        if (e.key === 'Enter' || e.key === 'r' || e.key === 'R') {
+          restartQuiz();
+        } else if (e.key === 'ArrowLeft') {
+          advancePrev();
+        }
+      }
+    });
+
+    // Handle Fullscreen UI state changes
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        presentationContainer.style.maxWidth = '100vw';
+        presentationContainer.style.borderRadius = '0px';
+      } else {
+        presentationContainer.style.maxWidth = '1200px';
+        presentationContainer.style.borderRadius = '12px';
+      }
+    });
+
+    // Initialize presentation on Welcome Screen
+    showScreen('welcome');
+  </script>
+</body>
+</html>
